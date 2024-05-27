@@ -52,8 +52,8 @@ jobs:
           context: .
           push: true
           tags: |
-            my-dockerhub-username/my-image-name:${{ env.SANITIZED_VERSION }}
-            my-dockerhub-username/my-image-name:latest
+            sayanpramanik/Minecraft_Paper:${{ env.SANITIZED_VERSION }}
+            sayanpramanik/Minecraft_Paper:latest
 
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
