@@ -1,59 +1,40 @@
+# Use the official Ubuntu 20.04 image as the base image
+
 FROM ubuntu:20.04
 
-## This line uses the official Ubuntu 20.04 image as the base image for our Dockerfile
+# Set environment variable to suppress interactive prompts from apt
 
-## The "FROM" instruction specifies the base image for our application and sets the context for any subsequent instructions
+ENV DEBIAN_FRONTEND=noninteractive
 
-- ENV DEBIAN_FRONTEND=noninteractive
-- WORKDIR /Minecraft
+# Set the working directory in the container to /Minecraft
 
-  ## The "WORKDIR" instruction sets the working directory in the container to /Minecraft
+WORKDIR /Minecraft
 
-  ## This is where all files will be located within the container
+# Update package lists and install Java Development Kit 17 and wget, then clean up temporary files
 
-- RUN apt-get update && apt-get install -y \
-  openjdk-17-jdk \
-  wget \
-  && rm -rf /var/lib/apt/lists/\*
+RUN apt-get update && apt-get install -y \
+ openjdk-17-jdk \
+ wget \
+ && rm -rf /var/lib/apt/lists/\*
 
-  ## The "RUN" instruction executes a command in the container
+# Copy files from the host machine to the container
 
-  ## In this case, the command is to install the Java Development Kit 17 and wget
+COPY ./paper-1.20.4-496.jar /Minecraft/paper.jar
+COPY ./server.properties /Minecraft/server.properties
+COPY ./plugins /Minecraft/plugins
 
-  ## The && symbol is a logical operator that runs the second command only if the first command is successful
+# Accept the Minecraft EULA by writing "eula=true" to eula.txt
 
-  ## The rm -rf /var/lib/apt/lists/\* command is used to clean up any temporary files created during the installation process
+RUN echo "eula=true" > eula.txt
 
-- COPY ./paper-1.20.4-496.jar /Minecraft/paper.jar
-- COPY ./server.properties /Minecraft/server.properties
-- COPY ./plugins /Minecraft/plugins
+# Expose port 25565 on the host machine
 
-  ## The "COPY" instruction copies files from the current directory on the host machine into the container
+EXPOSE 25565
 
-  ## In this case, the files paper-1.20.4-496.jar, server.properties, and plugins are copied into the /Minecraft directory in the container
+# Set the command to run when the container starts
 
-- RUN echo "eula=true" > eula.txt
-- EXPOSE 25565
+ENTRYPOINT ["java"]
 
-  ## The "EXPOSE" instruction tells which port to expose on the host machine when running the container
+# Provide default arguments to the ENTRYPOINT command
 
-  ## In this case, port 25565 is exposed
-
-- ENTRYPOINT [ "java" ]
-
-  ## The "ENTRYPOINT" instruction specifies the command to run when the container starts
-
-  ## In this case, the command is java -Xms10G -Xmx20G -jar paper.jar nogui
-
-  ## The "-Xms10G" and "-Xmx20G" options set the minimum and maximum Java heap sizes, respectively
-
-  ## The "-jar" option tells Java to run the specified JAR file, which is paper.jar in this case
-
-  ## The "nogui" option tells Java to run the server in headless mode, without a graphical user interface
-
-- CMD [ "-Xms10G", "-Xmx20G", "-jar", "paper.jar", "nogui" ]
-  ## The "CMD" instruction specifies additional arguments to pass to the ENTRYPOINT command
-  ## In this case, the command is java -Xms10G -Xmx20G -jar paper.jar nogui
-  ## The CMD instruction is optional and can be overridden when running the container with the -e flag
-  ## For example, to set a different JVM heap size when running the container, you could use the following command:
-  ## docker run -e JAVA_OPTS="-Xms4G -Xmx8G" image-name
+CMD ["-Xms10G", "-Xmx20G", "-jar", "paper.jar", "nogui"]
