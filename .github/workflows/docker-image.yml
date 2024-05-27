@@ -52,8 +52,8 @@ jobs:
           context: .
           push: true
           tags: |
-            sayanpramanik/Minecraft_Paper:${{ env.SANITIZED_VERSION }}
-            sayanpramanik/Minecraft_Paper:latest
+            sayanpramanik/minecraft_paper:${{ env.SANITIZED_VERSION }}
+            sayanpramanik/minecraft_paper:latest
 
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
